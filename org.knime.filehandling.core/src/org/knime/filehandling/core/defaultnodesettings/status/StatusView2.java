@@ -129,8 +129,7 @@ public final class StatusView2 {
      *
      * @return the label containing the status message
      */
-    public JPanel getLabel() {
+    public JPanel getPanel() {
         return m_statusLabel.getPanel();
     }
-
 }

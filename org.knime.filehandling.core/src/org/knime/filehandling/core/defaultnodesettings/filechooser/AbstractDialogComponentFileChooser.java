@@ -59,6 +59,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -206,7 +207,12 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         panel.add(m_fileSelection.getPanel(), gbc.incX().fillHorizontal().setWeightX(1).setWidth(2).build());
         panel.add(new FlowVariableModelButton(m_locationFvm), gbc.incX(2).setWeightX(0).setWidth(1).build());
         addAdditionalComponents(panel, gbc.resetX().incY());
-        panel.add(m_statusView.getLabel(), gbc.anchorLineStart().insetLeft(4).setX(1).setWeightX(0).incY().build());
+        //TODO why is the status view thingi getting bigger than the fileSelection
+        panel.add(Box.createHorizontalBox(), gbc.setWidth(1).insetLeft(0).setWeightX(0).resetX().incY().build());
+        panel.add(m_statusView.getPanel(), gbc.incX().fillBoth().setWeightX(1).setWeightY(1).setWidth(2).build());
+        panel.add(Box.createHorizontalBox(), gbc.incX(2).setWeightX(0).setWidth(1).build());
+//        panel.add(m_statusView.getLabel(), gbc.anchorLineStart().insetLeft(4).setX(1).setWidth(2).incY().build());
+//        panel.add(Box.createHorizontalBox(), gbc.anchorLineEnd().setWeightX(1).incX().setWidth(1).build());
     }
 
     private String getFSLabel() {
@@ -434,7 +440,6 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         @Override
         public void componentResized(final ComponentEvent e) {
             System.out.println(e.getComponent().getSize()+"Panel");
-            System.out.println(m_statusView.getLabel().getSize()+"Label");
             //TODO hier könnte man etwas machen..
         }
         /**

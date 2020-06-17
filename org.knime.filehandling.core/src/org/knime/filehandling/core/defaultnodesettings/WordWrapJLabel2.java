@@ -49,14 +49,18 @@
 package org.knime.filehandling.core.defaultnodesettings;
 
 import java.awt.Color;
-import java.awt.GridBagConstraints;
+import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
+
+import org.knime.filehandling.core.util.GBCBuilder;
 
 /**
  * A <code>JPanel</code> that wraps the text of the errors in a textarea and .
@@ -79,7 +83,7 @@ public final class WordWrapJLabel2 extends JPanel {
      */
     public WordWrapJLabel2(final String text, final Icon icon) {
 
-        final GridBagConstraints gbc = createGBC();
+        final GBCBuilder gbc = createGBC();
         this.setLayout(new GridBagLayout());
 
         m_icon = new JLabel();
@@ -87,12 +91,20 @@ public final class WordWrapJLabel2 extends JPanel {
 
         initializeTextArea(text);
 
-        this.add(m_icon, gbc);
-        gbc.gridx = 1;
-        gbc.weightx = 1;
-        gbc.weighty = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        this.add(m_textArea, gbc);
+        this.setPreferredSize(new Dimension(150,100));
+        this.setBorder(BorderFactory.createEtchedBorder());
+
+        this.add(m_icon, gbc.fillHorizontal().setWeightX(0).build());
+        this.add(m_textArea, gbc.incX().fillBoth().setWeightX(1.0).setWeightY(1.0).build());
+
+
+//        this.add(m_icon, gbc);
+//        gbc.gridx = 1;
+//        gbc.weightx = 1;
+//        gbc.weighty = 1;
+//        //TODO maybe horizontal is sufficent
+//        gbc.fill = GridBagConstraints.BOTH;
+//        this.add(m_textArea, gbc);
 
     }
 
@@ -101,14 +113,15 @@ public final class WordWrapJLabel2 extends JPanel {
      *
      * @return the GridBagConstraints
      */
-    private GridBagConstraints createGBC() {
-        final GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 0;
-        gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+    private GBCBuilder createGBC() {
+        final GBCBuilder gbc = new GBCBuilder(new Insets(5, 5, 5, 5)).resetX().resetY();
+//        final GridBagConstraints gbc = new GridBagConstraints();
+//        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+//        gbc.gridx = 0;
+//        gbc.gridy = 0;
+//        gbc.weightx = 0;
+//        gbc.weighty = 0;
+//        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         return gbc;
     }
@@ -120,6 +133,11 @@ public final class WordWrapJLabel2 extends JPanel {
      */
     private void initializeTextArea(final String text) {
         m_textArea = new JTextArea(0,0);
+        //TODO....
+//        m_textArea.setMinimumSize(new Dimension(150,20));
+//        m_textArea.setMinimumSize(new Dimension(20, 1));
+
+        m_textArea.setPreferredSize(new Dimension(150, 20));
         m_textArea.setText(text);
         m_textArea.setForeground(Color.red);
         m_textArea.setWrapStyleWord(true);
@@ -138,20 +156,7 @@ public final class WordWrapJLabel2 extends JPanel {
      */
     public void setText(final String text) {
         m_textArea.setText(text);
-        this.validate();
-//        Rectangle modelToView = null;
-//        try {
-//            modelToView = m_textArea.modelToView(m_textArea.getDocument().getLength());
-//        } catch (BadLocationException ex) {
-//            // TODO Auto-generated catch block
-//        }
-//        if (modelToView != null) {
-//            m_textArea.setSize(m_textArea.getWidth(), Math.max(m_textArea.getHeight(), modelToView.height + modelToView.y));
-//            m_textArea.doLayout();
-//        }
     }
-
-
     /**
      * Sets the icon.
      *
