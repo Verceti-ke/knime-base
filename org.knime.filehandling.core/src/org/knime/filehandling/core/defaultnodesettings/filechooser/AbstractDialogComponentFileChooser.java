@@ -50,6 +50,8 @@ package org.knime.filehandling.core.defaultnodesettings.filechooser;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
@@ -85,7 +87,7 @@ import org.knime.filehandling.core.defaultnodesettings.status.DefaultStatusMessa
 import org.knime.filehandling.core.defaultnodesettings.status.PriorityStatusConsumer;
 import org.knime.filehandling.core.defaultnodesettings.status.StatusMessage;
 import org.knime.filehandling.core.defaultnodesettings.status.StatusMessage.MessageType;
-import org.knime.filehandling.core.defaultnodesettings.status.StatusView;
+import org.knime.filehandling.core.defaultnodesettings.status.StatusView2;
 import org.knime.filehandling.core.util.CheckNodeContextUtil;
 import org.knime.filehandling.core.util.GBCBuilder;
 
@@ -113,7 +115,7 @@ import org.knime.filehandling.core.util.GBCBuilder;
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public abstract class AbstractDialogComponentFileChooser extends DialogComponent {
+public abstract class AbstractDialogComponentFileChooser extends DialogComponent implements ComponentListener {
 
     private final DialogType m_dialogType;
 
@@ -125,7 +127,7 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
 
     private final JLabel m_fileSelectionLabel = new JLabel("File:");
 
-    private final StatusView m_statusView = new StatusView(300);
+    private final StatusView2 m_statusView = new StatusView2();
 
     private final PriorityStatusConsumer m_statusConsumer = new PriorityStatusConsumer();
 
@@ -149,6 +151,10 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         final FileSystemBrowser.DialogType dialogType, final FlowVariableModel locationFvm,
         final FilterMode... filterModes) {
         super(model);
+
+
+        this.getComponentPanel().addComponentListener(this);
+
         m_dialogType = dialogType;
         m_locationFvm =
             CheckUtils.checkArgumentNotNull(locationFvm, "The location flow variable model must not be null.");
@@ -200,7 +206,7 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         panel.add(m_fileSelection.getPanel(), gbc.incX().fillHorizontal().setWeightX(1).setWidth(2).build());
         panel.add(new FlowVariableModelButton(m_locationFvm), gbc.incX(2).setWeightX(0).setWidth(1).build());
         addAdditionalComponents(panel, gbc.resetX().incY());
-        panel.add(m_statusView.getLabel(), gbc.anchorLineStart().insetLeft(4).setX(1).widthRemainder().incY().build());
+        panel.add(m_statusView.getLabel(), gbc.anchorLineStart().insetLeft(4).setX(1).setWeightX(0).incY().build());
     }
 
     private String getFSLabel() {
@@ -264,6 +270,7 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         updateFilterMode();
         updateFileSelectionLabel(location);
         updateBrowser();
+
         // the file system chooser updates itself when its config changes
 
         updateStatus();
@@ -423,5 +430,33 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         m_fileSelection.setTooltip(text);
         m_filterMode.setToolTipText(text);
     }
+
+        @Override
+        public void componentResized(final ComponentEvent e) {
+            System.out.println(e.getComponent().getSize()+"Panel");
+            System.out.println(m_statusView.getLabel().getSize()+"Label");
+            //TODO hier könnte man etwas machen..
+        }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void componentMoved(final ComponentEvent e) {
+            System.out.println(e.getComponent().getWidth());
+        }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void componentShown(final ComponentEvent e) {
+            System.out.println(e.getComponent().getWidth());
+        }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void componentHidden(final ComponentEvent e) {
+            System.out.println(e.getComponent().getWidth());
+        }
 
 }
