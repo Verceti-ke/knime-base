@@ -51,7 +51,7 @@ package org.knime.filehandling.core.defaultnodesettings.status;
 import java.util.Optional;
 
 import javax.swing.Icon;
-import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.knime.core.node.util.SharedIcons;
 import org.knime.filehandling.core.defaultnodesettings.WordWrapJLabel;
@@ -93,12 +93,12 @@ public final class StatusView {
      */
     public void setStatus(final StatusMessage message) {
         m_statusMsg = message;
-        m_statusLabel.setText(message.getMessage());
-        m_statusLabel.setIcon(getIcon(message.getType()));
+        m_statusLabel.m_label.setText(message.getMessage());
+        m_statusLabel.m_label.setIcon(getIcon(message.getType()));
         // make sure that we don't show the info icon if there is no message
         // (warning and error icons will still be shown)
         if (message.getType() == MessageType.INFO && message.getMessage().trim().length() == 0) {
-            m_statusLabel.setIcon(null);
+            m_statusLabel.m_label.setIcon(null);
         }
     }
 
@@ -122,7 +122,7 @@ public final class StatusView {
     public void clearStatus() {
         m_statusMsg = null;
         m_statusLabel.setText(" ");
-        m_statusLabel.setIcon(null);
+        m_statusLabel.m_label.setIcon(null);
     }
 
     /**
@@ -130,7 +130,7 @@ public final class StatusView {
      *
      * @return the label containing the status message
      */
-    public JLabel getLabel() {
+    public JPanel getLabel() {
         return m_statusLabel;
     }
 

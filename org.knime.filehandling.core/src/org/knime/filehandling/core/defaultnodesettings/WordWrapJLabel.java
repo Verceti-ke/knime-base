@@ -48,11 +48,17 @@
  */
 package org.knime.filehandling.core.defaultnodesettings;
 
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.regex.Pattern;
 
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.text.View;
 
 import org.apache.commons.lang3.RegExUtils;
+import org.knime.filehandling.core.util.GBCBuilder;
 
 /**
  * A <code>JLabel</code> that wraps the text in a fixed size HTML paragraph to ensure word wrapping.
@@ -60,13 +66,15 @@ import org.apache.commons.lang3.RegExUtils;
  * @author Mareike Hoeger, KNIME GmbH, Konstanz, Germany
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public final class WordWrapJLabel extends JLabel {
+public final class WordWrapJLabel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
     private static final int DEFAULT_WIDTH = 700;
 
-    private final String m_html;
+    private String m_html;
+
+    public final JLabel m_label;
 
 
     /**
@@ -85,22 +93,73 @@ public final class WordWrapJLabel extends JLabel {
      * @param widthInPixel label width in pixels
      */
     public WordWrapJLabel(final String text, final int widthInPixel) {
-        super(text);
+        super(new GridBagLayout());
+        GBCBuilder gbc = createGBC();
+        m_label = new JLabel(text);
+        this.add(m_label, gbc.fillHorizontal().setWeightX(1).setWeightY(1).fillBoth().build());
+//        this.add(m_textArea, gbc.incX().fillBoth().setWeightX(1.0).setWeightY(1.0).build());
         m_html = createHtmlTemplate(widthInPixel);
+    }
+
+    private GBCBuilder createGBC() {
+        return new GBCBuilder(new Insets(5, 5, 5, 5)).resetX().resetY();
+
+//        final GridBagConstraints gbc = new GridBagConstraints();
+//        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+//        gbc.gridx = 0;
+//        gbc.gridy = 0;
+//        gbc.weightx = 0;
+//        gbc.weighty = 0;
+//        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+    }
+
+
+    private static final JLabel resizer = new JLabel();
+
+    /**Returns the preferred size to set a component at in order to render
+     * an html string.  You can specify the size of one dimension.*/
+    public static Dimension getPreferredSize(final String html,
+                                                      final boolean width, final int prefSize) {
+
+        resizer.setText(html);
+
+        View view = (View) resizer.getClientProperty(
+                javax.swing.plaf.basic.BasicHTML.propertyKey);
+
+        view.setSize(width?prefSize:0,width?0:prefSize);
+
+        float w = view.getPreferredSpan(View.X_AXIS);
+        float h = view.getPreferredSpan(View.Y_AXIS);
+
+        return new java.awt.Dimension((int) Math.ceil(w),
+                (int) Math.ceil(h));
     }
 
     private static String createHtmlTemplate(final int widthInPixel) {
         return "<html><body style='width: " + widthInPixel + "px'><p>%s</p></body></html>";
     }
 
-    @Override
+    /**
+     * @param widthInPixel
+     * @param text
+     */
     public void setText(final String text) {
         if (m_html == null) {
             // only happens during the call of the super constructor
-            super.setText(text);
+            m_label.setText(text);
         } else {
-            super.setText(String.format(m_html, addWordBreakHints(text)));
+            m_label.setText(String.format(m_html, addWordBreakHints(text)));
+
         }
+
+    }
+
+    public void setTextandos(final int widthInPixel, final String text) {
+
+        m_html = createHtmlTemplate(widthInPixel);
+        m_label.setPreferredSize(getPreferredSize(m_html, true, widthInPixel));
+        setText(text);
     }
 
     private static String addWordBreakHints(final String text) {

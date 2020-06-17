@@ -114,7 +114,8 @@ public final class WordWrapJLabel2 extends JPanel {
      * @return the GridBagConstraints
      */
     private GBCBuilder createGBC() {
-        final GBCBuilder gbc = new GBCBuilder(new Insets(5, 5, 5, 5)).resetX().resetY();
+        return new GBCBuilder(new Insets(5, 5, 5, 5)).resetX().resetY();
+
 //        final GridBagConstraints gbc = new GridBagConstraints();
 //        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
 //        gbc.gridx = 0;
@@ -123,7 +124,6 @@ public final class WordWrapJLabel2 extends JPanel {
 //        gbc.weighty = 0;
 //        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        return gbc;
     }
 
     /**

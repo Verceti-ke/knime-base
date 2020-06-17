@@ -59,7 +59,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -88,7 +87,7 @@ import org.knime.filehandling.core.defaultnodesettings.status.DefaultStatusMessa
 import org.knime.filehandling.core.defaultnodesettings.status.PriorityStatusConsumer;
 import org.knime.filehandling.core.defaultnodesettings.status.StatusMessage;
 import org.knime.filehandling.core.defaultnodesettings.status.StatusMessage.MessageType;
-import org.knime.filehandling.core.defaultnodesettings.status.StatusView2;
+import org.knime.filehandling.core.defaultnodesettings.status.StatusView;
 import org.knime.filehandling.core.util.CheckNodeContextUtil;
 import org.knime.filehandling.core.util.GBCBuilder;
 
@@ -116,7 +115,7 @@ import org.knime.filehandling.core.util.GBCBuilder;
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public abstract class AbstractDialogComponentFileChooser extends DialogComponent implements ComponentListener {
+public abstract class AbstractDialogComponentFileChooser extends DialogComponent {
 
     private final DialogType m_dialogType;
 
@@ -128,7 +127,7 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
 
     private final JLabel m_fileSelectionLabel = new JLabel("File:");
 
-    private final StatusView2 m_statusView = new StatusView2();
+    private final StatusView m_statusView = new StatusView(300);
 
     private final PriorityStatusConsumer m_statusConsumer = new PriorityStatusConsumer();
 
@@ -153,9 +152,6 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         final FilterMode... filterModes) {
         super(model);
 
-
-        this.getComponentPanel().addComponentListener(this);
-
         m_dialogType = dialogType;
         m_locationFvm =
             CheckUtils.checkArgumentNotNull(locationFvm, "The location flow variable model must not be null.");
@@ -173,6 +169,7 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
             model.getFileSystemConfiguration().getSupportedFileSelectionModes();
         m_fileSelection = new FileSelectionDialog(historyID, 10, model::getConnection, dialogType,
             supportedModes.iterator().next(), model.getFileExtensions());
+
         hookUpListeners();
         layout(selectableFilterModes.size() > 1);
     }
@@ -190,6 +187,36 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         m_fileSelection.addListener(e -> handleFileSelectionChange());
         getModel().addChangeListener(e -> updateComponent());
         m_locationFvm.addChangeListener(e -> handleFlowVariableModelChange());
+        m_fileSelection.getPanel().addComponentListener(new ComponentListener() {
+
+            @Override
+            public void componentShown(final ComponentEvent e) {
+                //nothing to do here
+            }
+
+            @Override
+            public void componentResized(final ComponentEvent e) {
+//                System.out.println(e.getComponent().getSize()+"Panel");
+//
+//               WordWrapJLabel as =  (WordWrapJLabel) m_statusView.getLabel();
+//               System.out.println(as.getSize()+"Label");
+//               as.setSize(as.getWidth()-40, as.getHeight());
+//               if(as.getWidth() < e.getComponent().getWidth()) {
+//                   as.setTextandos(700, as.m_label.getText());
+//               }
+
+            }
+
+            @Override
+            public void componentMoved(final ComponentEvent e) {
+              //nothing to do here
+            }
+
+            @Override
+            public void componentHidden(final ComponentEvent e) {
+                //nothing to do here
+            }
+        });
     }
 
     private void layout(final boolean displayFilterModes) {
@@ -207,12 +234,7 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         panel.add(m_fileSelection.getPanel(), gbc.incX().fillHorizontal().setWeightX(1).setWidth(2).build());
         panel.add(new FlowVariableModelButton(m_locationFvm), gbc.incX(2).setWeightX(0).setWidth(1).build());
         addAdditionalComponents(panel, gbc.resetX().incY());
-        //TODO why is the status view thingi getting bigger than the fileSelection
-        panel.add(Box.createHorizontalBox(), gbc.setWidth(1).insetLeft(0).setWeightX(0).resetX().incY().build());
-        panel.add(m_statusView.getPanel(), gbc.incX().fillBoth().setWeightX(1).setWeightY(1).setWidth(2).build());
-        panel.add(Box.createHorizontalBox(), gbc.incX(2).setWeightX(0).setWidth(1).build());
-//        panel.add(m_statusView.getLabel(), gbc.anchorLineStart().insetLeft(4).setX(1).setWidth(2).incY().build());
-//        panel.add(Box.createHorizontalBox(), gbc.anchorLineEnd().setWeightX(1).incX().setWidth(1).build());
+        panel.add(m_statusView.getLabel(), gbc.anchorLineStart().insetLeft(4).setX(1).widthRemainder().incY().build());
     }
 
     private String getFSLabel() {
@@ -436,32 +458,4 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         m_fileSelection.setTooltip(text);
         m_filterMode.setToolTipText(text);
     }
-
-        @Override
-        public void componentResized(final ComponentEvent e) {
-            System.out.println(e.getComponent().getSize()+"Panel");
-            //TODO hier könnte man etwas machen..
-        }
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void componentMoved(final ComponentEvent e) {
-            System.out.println(e.getComponent().getWidth());
-        }
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void componentShown(final ComponentEvent e) {
-            System.out.println(e.getComponent().getWidth());
-        }
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void componentHidden(final ComponentEvent e) {
-            System.out.println(e.getComponent().getWidth());
-        }
-
 }
