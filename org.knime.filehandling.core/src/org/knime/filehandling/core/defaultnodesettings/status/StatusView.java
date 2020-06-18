@@ -93,12 +93,12 @@ public final class StatusView {
      */
     public void setStatus(final StatusMessage message) {
         m_statusMsg = message;
-        m_statusLabel.m_label.setText(message.getMessage());
-        m_statusLabel.m_label.setIcon(getIcon(message.getType()));
+        m_statusLabel.setText(message.getMessage());
+        m_statusLabel.setIcon(getIcon(message.getType()));
         // make sure that we don't show the info icon if there is no message
         // (warning and error icons will still be shown)
         if (message.getType() == MessageType.INFO && message.getMessage().trim().length() == 0) {
-            m_statusLabel.m_label.setIcon(null);
+            m_statusLabel.setIcon(null);
         }
     }
 
@@ -122,7 +122,7 @@ public final class StatusView {
     public void clearStatus() {
         m_statusMsg = null;
         m_statusLabel.setText(" ");
-        m_statusLabel.m_label.setIcon(null);
+        m_statusLabel.setIcon(null);
     }
 
     /**
@@ -130,7 +130,7 @@ public final class StatusView {
      *
      * @return the label containing the status message
      */
-    public JPanel getLabel() {
+    public JPanel getPanel() {
         return m_statusLabel;
     }
 

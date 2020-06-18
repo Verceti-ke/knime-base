@@ -48,6 +48,7 @@
  */
 package org.knime.filehandling.core.defaultnodesettings.filechooser;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ComponentEvent;
@@ -76,6 +77,7 @@ import org.knime.core.node.workflow.FlowVariable;
 import org.knime.filehandling.core.connections.FSCategory;
 import org.knime.filehandling.core.connections.FSLocation;
 import org.knime.filehandling.core.data.location.variable.FSLocationVariableType;
+import org.knime.filehandling.core.defaultnodesettings.WordWrapJLabel;
 import org.knime.filehandling.core.defaultnodesettings.fileselection.FileSelectionDialog;
 import org.knime.filehandling.core.defaultnodesettings.filesystemchooser.FileSystemChooserUtils;
 import org.knime.filehandling.core.defaultnodesettings.filesystemchooser.config.FileSystemConfiguration;
@@ -170,6 +172,7 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         m_fileSelection = new FileSelectionDialog(historyID, 10, model::getConnection, dialogType,
             supportedModes.iterator().next(), model.getFileExtensions());
 
+
         hookUpListeners();
         layout(selectableFilterModes.size() > 1);
     }
@@ -183,12 +186,14 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         return m_dialogType;
     }
 
+
     private void hookUpListeners() {
         m_fileSelection.addListener(e -> handleFileSelectionChange());
         getModel().addChangeListener(e -> updateComponent());
         m_locationFvm.addChangeListener(e -> handleFlowVariableModelChange());
-        m_fileSelection.getPanel().addComponentListener(new ComponentListener() {
 
+
+        m_fileSelection.getPanel().addComponentListener(new ComponentListener() {
             @Override
             public void componentShown(final ComponentEvent e) {
                 //nothing to do here
@@ -196,15 +201,8 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
 
             @Override
             public void componentResized(final ComponentEvent e) {
-//                System.out.println(e.getComponent().getSize()+"Panel");
-//
-//               WordWrapJLabel as =  (WordWrapJLabel) m_statusView.getLabel();
-//               System.out.println(as.getSize()+"Label");
-//               as.setSize(as.getWidth()-40, as.getHeight());
-//               if(as.getWidth() < e.getComponent().getWidth()) {
-//                   as.setTextandos(700, as.m_label.getText());
-//               }
-
+                final Dimension dim =  e.getComponent().getSize();
+                final WordWrapJLabel label = (WordWrapJLabel) m_statusView.getPanel();
             }
 
             @Override
@@ -234,7 +232,7 @@ public abstract class AbstractDialogComponentFileChooser extends DialogComponent
         panel.add(m_fileSelection.getPanel(), gbc.incX().fillHorizontal().setWeightX(1).setWidth(2).build());
         panel.add(new FlowVariableModelButton(m_locationFvm), gbc.incX(2).setWeightX(0).setWidth(1).build());
         addAdditionalComponents(panel, gbc.resetX().incY());
-        panel.add(m_statusView.getLabel(), gbc.anchorLineStart().insetLeft(4).setX(1).widthRemainder().incY().build());
+        panel.add(m_statusView.getPanel(), gbc.anchorLineStart().insetLeft(4).setX(1).fillVertical().setWeightY(1).incY().build());
     }
 
     private String getFSLabel() {

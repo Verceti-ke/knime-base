@@ -214,6 +214,16 @@ public final class GBCBuilder {
     }
 
     /**
+     * Sets the {@link GridBagConstraints#fill} property to {@link GridBagConstraints#VERTICAL}.
+     *
+     * @return this builder
+     */
+    public GBCBuilder fillVertical() {
+        m_gbc.fill = GridBagConstraints.VERTICAL;
+        return this;
+    }
+
+    /**
      * Sets the {@link GridBagConstraints#fill} property to {@link GridBagConstraints#BOTH}.
      *
      * @return this builder

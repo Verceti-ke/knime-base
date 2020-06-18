@@ -48,14 +48,13 @@
  */
 package org.knime.filehandling.core.defaultnodesettings;
 
-import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.regex.Pattern;
 
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.text.View;
 
 import org.apache.commons.lang3.RegExUtils;
 import org.knime.filehandling.core.util.GBCBuilder;
@@ -74,8 +73,7 @@ public final class WordWrapJLabel extends JPanel {
 
     private String m_html;
 
-    public final JLabel m_label;
-
+    private JLabel m_label;
 
     /**
      * Creates a <code>JLabel</code> that wraps the text in a fixed size HTML paragraph to ensure word wrapping.
@@ -94,50 +92,18 @@ public final class WordWrapJLabel extends JPanel {
      */
     public WordWrapJLabel(final String text, final int widthInPixel) {
         super(new GridBagLayout());
-        GBCBuilder gbc = createGBC();
+        final GBCBuilder gbc = createGBC();
         m_label = new JLabel(text);
-        this.add(m_label, gbc.fillHorizontal().setWeightX(1).setWeightY(1).fillBoth().build());
-//        this.add(m_textArea, gbc.incX().fillBoth().setWeightX(1.0).setWeightY(1.0).build());
+        this.add(m_label, gbc.setWeightY(1).setWeightX(0).fillVertical().build());
         m_html = createHtmlTemplate(widthInPixel);
     }
 
     private GBCBuilder createGBC() {
         return new GBCBuilder(new Insets(5, 5, 5, 5)).resetX().resetY();
-
-//        final GridBagConstraints gbc = new GridBagConstraints();
-//        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-//        gbc.gridx = 0;
-//        gbc.gridy = 0;
-//        gbc.weightx = 0;
-//        gbc.weighty = 0;
-//        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-    }
-
-
-    private static final JLabel resizer = new JLabel();
-
-    /**Returns the preferred size to set a component at in order to render
-     * an html string.  You can specify the size of one dimension.*/
-    public static Dimension getPreferredSize(final String html,
-                                                      final boolean width, final int prefSize) {
-
-        resizer.setText(html);
-
-        View view = (View) resizer.getClientProperty(
-                javax.swing.plaf.basic.BasicHTML.propertyKey);
-
-        view.setSize(width?prefSize:0,width?0:prefSize);
-
-        float w = view.getPreferredSpan(View.X_AXIS);
-        float h = view.getPreferredSpan(View.Y_AXIS);
-
-        return new java.awt.Dimension((int) Math.ceil(w),
-                (int) Math.ceil(h));
     }
 
     private static String createHtmlTemplate(final int widthInPixel) {
-        return "<html><body style='width: " + widthInPixel + "px'><p>%s</p></body></html>";
+        return "<html><body WIDTH=%d><div><p>%s</p></div></body></html>";
     }
 
     /**
@@ -149,17 +115,30 @@ public final class WordWrapJLabel extends JPanel {
             // only happens during the call of the super constructor
             m_label.setText(text);
         } else {
-            m_label.setText(String.format(m_html, addWordBreakHints(text)));
-
+            m_label.setText(String.format(m_html, DEFAULT_WIDTH, addWordBreakHints(text)));
         }
 
+        this.revalidate();
     }
 
-    public void setTextandos(final int widthInPixel, final String text) {
-
+    public void setText(final String text, final int widthInPixel) {
         m_html = createHtmlTemplate(widthInPixel);
-        m_label.setPreferredSize(getPreferredSize(m_html, true, widthInPixel));
-        setText(text);
+        if (m_html == null) {
+            // only happens during the call of the super constructor
+            m_label.setText(text);
+        } else {
+            m_label.setText(String.format(m_html, widthInPixel, addWordBreakHints(text)));
+        }
+        m_label.revalidate();
+        m_label.repaint();
+    }
+
+    public void setIcon(final Icon icon) {
+        m_label.setIcon(icon);
+    }
+
+    public JLabel getLabel() {
+        return m_label;
     }
 
     private static String addWordBreakHints(final String text) {
