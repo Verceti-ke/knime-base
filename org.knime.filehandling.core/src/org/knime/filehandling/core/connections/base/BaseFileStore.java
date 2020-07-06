@@ -54,6 +54,7 @@ import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileAttributeView;
 import java.nio.file.attribute.FileStoreAttributeView;
 import java.nio.file.attribute.PosixFileAttributeView;
+import java.util.Objects;
 
 import org.apache.commons.lang3.Validate;
 
@@ -189,4 +190,23 @@ public class BaseFileStore extends FileStore {
         throw new IOException(String.format("Attributes are not supported for the FileStore %s.", m_name));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if(obj instanceof BaseFileStore) {
+            BaseFileStore other = (BaseFileStore)obj;
+            return m_type.equals(other.m_type) && m_name.equals(other.m_name);
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(m_type, m_name);
+    }
 }
