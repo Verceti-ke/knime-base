@@ -6,6 +6,13 @@
    <extension
          point="org.knime.workbench.repository.categories">
       <category
+            icon="icons/file_system_connector.png"
+            level-id="file-handling-connectors"
+            locked="true"
+            name="Connectors"
+            path="/io/connectors">
+      </category>
+      <category
             icon="icons/cfilehandling16x16.png"
             level-id="file-handling-prototype"
             locked="true"
