@@ -67,7 +67,7 @@ import com.google.common.base.Objects;
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-final class AnalysisComponentModel {
+public final class AnalysisComponentModel {
 
     private static final String EMPTY_SPACE_RESERVING_LABEL_TEXT = " ";
 
@@ -164,7 +164,7 @@ final class AnalysisComponentModel {
         m_quickScan.setEnabled(true);
     }
 
-    void resetErrorLabel() {
+    public void resetErrorLabel() {
         resetErrorLabelInternal();
         notifyListeners();
     }
@@ -184,23 +184,23 @@ final class AnalysisComponentModel {
         }
     }
 
-    void setError(final String text) {
+    public void setError(final String text) {
         setError(-1, text);
     }
 
-    void setInfo(final String text) {
+    public void setInfo(final String text) {
         m_errorIcon = SharedIcons.INFO_BALLOON.get();
         m_errorText = text;
         notifyListeners();
     }
 
-    void reset() {
+    public void reset() {
         resetAnalysisComponentsInternal();
         resetErrorLabelInternal();
         notifyListeners();
     }
 
-    void setVisible(final boolean visible) {
+    public void setVisible(final boolean visible) {
         if (setVisibleInternal(visible)) {
             m_progress.setValue(0);
             notifyListeners();

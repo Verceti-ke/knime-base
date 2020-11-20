@@ -79,7 +79,7 @@ import org.knime.filehandling.core.node.table.reader.util.StagedMultiTableRead;
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-final class SpecGuessingSwingWorker<C extends ReaderSpecificConfig<C>, T>
+public final class SpecGuessingSwingWorker<C extends ReaderSpecificConfig<C>, T>
     extends SwingWorkerWithContext<StagedMultiTableRead<T>, AnalysisUpdate> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(SpecGuessingSwingWorker.class);
@@ -98,7 +98,7 @@ final class SpecGuessingSwingWorker<C extends ReaderSpecificConfig<C>, T>
 
     private final Consumer<StagedMultiTableRead<T>> m_resultConsumer;
 
-    SpecGuessingSwingWorker(final MultiTableReadFactory<C, T> reader,
+    public SpecGuessingSwingWorker(final MultiTableReadFactory<C, T> reader,
         final String rootPath, final List<Path> paths, final ImmutableMultiTableReadConfig<C> config,
         final AnalysisComponentModel analysisComponent, final Consumer<StagedMultiTableRead<T>> resultConsumer) {
         m_rootPath = rootPath;

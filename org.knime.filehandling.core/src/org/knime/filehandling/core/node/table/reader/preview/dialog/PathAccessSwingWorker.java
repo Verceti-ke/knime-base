@@ -63,7 +63,7 @@ import org.knime.filehandling.core.defaultnodesettings.filechooser.reader.ReadPa
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-final class PathAccessSwingWorker extends SwingWorkerWithContext<Pair<Path, List<Path>>, Void> {
+public final class PathAccessSwingWorker extends SwingWorkerWithContext<Pair<Path, List<Path>>, Void> {
 
     private static final int DELAY = 200;
 
@@ -75,7 +75,7 @@ final class PathAccessSwingWorker extends SwingWorkerWithContext<Pair<Path, List
 
     private final Consumer<ExecutionException> m_exceptionConsumer;
 
-    PathAccessSwingWorker(final ReadPathAccessor pathAccessor, final Consumer<Pair<Path, List<Path>>> pathsConsumer, final Consumer<ExecutionException> exceptionConsumer) {
+    public PathAccessSwingWorker(final ReadPathAccessor pathAccessor, final Consumer<Pair<Path, List<Path>>> pathsConsumer, final Consumer<ExecutionException> exceptionConsumer) {
         m_pathAccessor = pathAccessor;
         m_pathsConsumer = pathsConsumer;
         m_exceptionConsumer = exceptionConsumer;

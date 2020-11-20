@@ -74,7 +74,7 @@ import org.knime.filehandling.core.node.table.reader.util.StagedMultiTableRead;
  * @noreference non-public API
  * @noinstantiate non-public API
  */
-final class MultiTableReader<C extends ReaderSpecificConfig<C>> {
+public final class MultiTableReader<C extends ReaderSpecificConfig<C>> {
 
     private final MultiTableReadFactory<C, ?> m_multiTableReadFactory;
 
@@ -86,7 +86,7 @@ final class MultiTableReader<C extends ReaderSpecificConfig<C>> {
      * @param reader the {@link TableReader} implementation to use for reading
      * @param multiTableReadFactory for creating MultiTableRead objects
      */
-    MultiTableReader(final MultiTableReadFactory<C, ?> multiTableReadFactory) {
+    public MultiTableReader(final MultiTableReadFactory<C, ?> multiTableReadFactory) {
         m_multiTableReadFactory = multiTableReadFactory;
     }
 

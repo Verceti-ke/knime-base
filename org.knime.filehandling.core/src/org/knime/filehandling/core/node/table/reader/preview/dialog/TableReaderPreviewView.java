@@ -85,13 +85,13 @@ public final class TableReaderPreviewView extends JPanel {
 
     private final ChangeEvent m_changeEvent = new ChangeEvent(this);
 
-    TableReaderPreviewView(final TableReaderPreviewModel model) {
+    public TableReaderPreviewView(final TableReaderPreviewModel model) {
         m_analysisComponentView = new AnalysisComponentView(model.getAnalysisComponent());
         m_tableView = new TableView(model.getPreviewTableModel());
         // reordering the columns might give the impression that the order in the output changes too
-        m_tableView.getContentTable().getTableHeader().setReorderingAllowed(false);
+        getTableView().getContentTable().getTableHeader().setReorderingAllowed(false);
         // tell listeners that the scrolling changed
-        m_tableView.getViewport().addChangeListener(e -> notifyListeners());
+        getTableView().getViewport().addChangeListener(e -> notifyListeners());
         createPanel();
     }
 
@@ -106,17 +106,24 @@ public final class TableReaderPreviewView extends JPanel {
         setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Preview"));
         final GBCBuilder gbc = new GBCBuilder().resetX().resetY().anchorFirstLineStart();
         add(m_analysisComponentView, gbc.build());
-        m_tableView.setPreferredSize(new Dimension(PREVIEW_WIDTH, PREVIEW_HEIGHT));
-        add(m_tableView, gbc.fillBoth().incY().setWeightX(1).setWeightY(1).build());
+        getTableView().setPreferredSize(new Dimension(PREVIEW_WIDTH, PREVIEW_HEIGHT));
+        add(getTableView(), gbc.fillBoth().incY().setWeightX(1).setWeightY(1).build());
     }
 
-    void updateViewport(final TableReaderPreviewView other) {
-        final Rectangle visibleRect = other.m_tableView.getViewport().getViewRect();
-        m_tableView.getViewport().setViewPosition(visibleRect.getLocation());
+    public void updateViewport(final TableReaderPreviewView other) {
+        final Rectangle visibleRect = other.getTableView().getViewport().getViewRect();
+        getTableView().getViewport().setViewPosition(visibleRect.getLocation());
     }
 
-    void addScrollListener(final ChangeListener scrollListener) {
+    public void addScrollListener(final ChangeListener scrollListener) {
         m_scrollListeners.add(scrollListener);
+    }
+
+    /**
+     * @return the tableView
+     */
+    public TableView getTableView() {
+        return m_tableView;
     }
 
 }

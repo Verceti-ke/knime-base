@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JComponent;
 import javax.swing.JSplitPane;
 import javax.swing.event.ChangeEvent;
 
@@ -150,6 +151,13 @@ public abstract class AbstractTableReaderNodeDialog<C extends ReaderSpecificConf
         return preview;
     }
 
+    protected final TableReaderPreviewView createPreview(final TableReaderPreviewModel model) {
+        final TableReaderPreviewView preview = new TableReaderPreviewView(m_previewModel);
+        m_previews.add(preview);
+        preview.addScrollListener(this::updateScrolling);
+        return preview;
+    }
+
     /**
      * Convenience method that creates a {@link JSplitPane} containing the {@link TableTransformationPanel} and a
      * {@link TableReaderPreviewView}. NOTE: If this method is called multiple times, then the
@@ -160,10 +168,14 @@ public abstract class AbstractTableReaderNodeDialog<C extends ReaderSpecificConf
     protected final JSplitPane createTransformationTab() {
         final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         splitPane.setLeftComponent(getTransformationPanel());
-        splitPane.setRightComponent(createPreview());
+        splitPane.setRightComponent(createPreviewComponent());
         splitPane.setOneTouchExpandable(true);
         splitPane.setDividerSize(15);
         return splitPane;
+    }
+
+    protected JComponent createPreviewComponent() {
+        return createPreview();
     }
 
     private void updateScrolling(final ChangeEvent changeEvent) {
