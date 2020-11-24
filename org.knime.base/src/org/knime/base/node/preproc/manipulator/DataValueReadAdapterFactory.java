@@ -55,6 +55,7 @@ import java.util.Set;
 
 import org.knime.core.data.DataType;
 import org.knime.core.data.DataValue;
+import org.knime.core.data.collection.ListCell;
 import org.knime.core.data.convert.java.DataCellToJavaConverter;
 import org.knime.core.data.convert.java.DataCellToJavaConverterFactory;
 import org.knime.core.data.convert.java.DataCellToJavaConverterRegistry;
@@ -83,27 +84,35 @@ public enum DataValueReadAdapterFactory implements ReadAdapterFactory<DataType, 
     private static final ProducerRegistry<DataType, DataValueReadAdapter> PRODUCER_REGISTRY;
 
     static {
-        PRODUCER_REGISTRY = MappingFramework.forSourceType(DataValueReadAdapter.class);
+    	PRODUCER_REGISTRY = MappingFramework.forSourceType(DataValueReadAdapter.class);
         PRODUCER_REGISTRY.unregisterAllProducers();
         final Set<DataType> dataTypes = DataCellToJavaConverterRegistry.getInstance().getAllConvertibleDataTypes();
-        Set<String> registered = new HashSet<>();
+        final Set<String> registered = new HashSet<>();
         for (final DataType sourceType : dataTypes) {
-            Collection<DataCellToJavaConverterFactory<?, ?>> factoriesForSourceType =
-                    DataCellToJavaConverterRegistry.getInstance().getFactoriesForSourceType(sourceType);
-            for (DataCellToJavaConverterFactory<?, ?> factory : factoriesForSourceType) {
-                final Class<?> destinationType = factory.getDestinationType();
-                final String identifier = sourceType.getName() + "->" + destinationType.getName();
-                if (registered.add(identifier)) {
-                    @SuppressWarnings("rawtypes")
-                    final CellValueProducerFactoryImplementation<?> converter =
-                    new CellValueProducerFactoryImplementation(destinationType, identifier, sourceType,
-                        factory.create());
-                    PRODUCER_REGISTRY.register(converter);
-                }
-            }
+            register(registered, sourceType);
+            register(registered, ListCell.getCollectionType(sourceType));
+            //TODO: Set cells are not supported in the type mapping framework see ArrayToCollectionConverterFactory
+//            register(registered, SetCell.getCollectionType(sourceType));
         }
         //register the most common type
         PRODUCER_REGISTRY.register(new FallBackProducerFactory());
+    }
+
+    private static void register(final Set<String> registered, final DataType sourceType) {
+        final Collection<DataCellToJavaConverterFactory<?, ?>> factoriesForSourceType =
+                DataCellToJavaConverterRegistry.getInstance().getFactoriesForSourceType(sourceType);
+        for (DataCellToJavaConverterFactory<?, ?> factory : factoriesForSourceType) {
+            final Class<?> destinationType = factory.getDestinationType();
+            final String sourceTypeName = sourceType.toPrettyString();
+            final String identifier = sourceTypeName + "->" + destinationType.getName();
+            if (registered.add(identifier)) {
+                @SuppressWarnings("rawtypes")
+                final CellValueProducerFactoryImplementation<?> converter =
+                new CellValueProducerFactoryImplementation(destinationType, identifier, sourceType,
+                    factory.create());
+                PRODUCER_REGISTRY.register(converter);
+            }
+        }
     }
 
     private static final class FallBackProducerFactory implements
