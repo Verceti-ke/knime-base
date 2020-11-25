@@ -49,6 +49,7 @@
 package org.knime.filehandling.core.node.table.reader.preview.dialog.transformer;
 
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -63,11 +64,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.convert.map.ProductionPath;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.util.CheckUtils;
+import org.knime.filehandling.core.node.table.reader.preview.dialog.transformer.ReorderRenderer.Direction;
 import org.knime.filehandling.core.util.GBCBuilder;
 
 /**
@@ -98,6 +101,27 @@ public final class TableTransformationPanel extends JPanel {
 
     private final ColumnFilterModePanel m_columnFilterModePanel;
 
+    private static class MyJTable extends JTable {
+
+        MyJTable(final TableModel model) {
+            super(model);
+        }
+
+        @Override
+        public int rowAtPoint(final Point point) {
+            int row = super.rowAtPoint(point);
+//            System.out.printf("rowAtPoint(%s): %s\n", point, row);
+            return row;
+        }
+
+        @Override
+        public int columnAtPoint(final Point point) {
+            int columnAtPoint = super.columnAtPoint(point);
+//            System.out.printf("columnAtPoint(%s): %s\n", point, columnAtPoint);
+            return columnAtPoint;
+        }
+    }
+
     /**
      * Constructor.
      *
@@ -113,7 +137,7 @@ public final class TableTransformationPanel extends JPanel {
         } else {
             m_columnFilterModePanel = null;
         }
-        m_transformationTable = new JTable(model);
+        m_transformationTable = new MyJTable(model);
         m_tableModel = model;
         setupTable(model, productionPathProvider);
 
@@ -146,6 +170,7 @@ public final class TableTransformationPanel extends JPanel {
         TableColumnModel columnModel = m_transformationTable.getColumnModel();
         columnModel.getColumn(0).setMaxWidth(30);
         columnModel.getColumn(1).setMaxWidth(30);
+        columnModel.getColumn(5).setMaxWidth(50);
         final TransformationTableHeader header = new TransformationTableHeader(columnModel);
         header.setReorderingAllowed(false);
         m_transformationTable.setRowSelectionAllowed(true);
@@ -154,11 +179,13 @@ public final class TableTransformationPanel extends JPanel {
         m_transformationTable.setDefaultEditor(ProductionPath.class,
             new ProductionPathCellEditor(productionPathProvider));
         m_transformationTable.setDefaultEditor(String.class, new ColumnNameCellEditor(model));
+        m_transformationTable.setDefaultEditor(Direction.class, new ReorderRenderer());
         // this property ensures that currently edited values are committed to the model if the table loses focus
         m_transformationTable.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         m_transformationTable.setDefaultRenderer(ProductionPath.class, new KnimeTypeProductionPathTableCellRenderer());
         m_transformationTable.setDefaultRenderer(String.class, new ColumnNameCellRenderer());
         m_transformationTable.setDefaultRenderer(DataColumnSpec.class, new SpecCellRenderer());
+        m_transformationTable.setDefaultRenderer(Direction.class, new ReorderRenderer());
         m_transformationTable.setRowHeight(25);
         // enable drag-and-drop
         m_transformationTable.setDragEnabled(true);

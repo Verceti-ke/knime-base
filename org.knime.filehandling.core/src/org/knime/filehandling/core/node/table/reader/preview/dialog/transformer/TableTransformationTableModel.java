@@ -78,6 +78,7 @@ import org.knime.core.data.convert.map.ProductionPath;
 import org.knime.core.node.util.SharedIcons;
 import org.knime.filehandling.core.node.table.reader.DefaultTableTransformation;
 import org.knime.filehandling.core.node.table.reader.ImmutableColumnTransformation;
+import org.knime.filehandling.core.node.table.reader.preview.dialog.transformer.ReorderRenderer.Direction;
 import org.knime.filehandling.core.node.table.reader.selector.ColumnFilterMode;
 import org.knime.filehandling.core.node.table.reader.selector.ColumnTransformation;
 import org.knime.filehandling.core.node.table.reader.selector.ObservableTransformationModelProvider;
@@ -108,7 +109,9 @@ public final class TableTransformationTableModel<T> extends AbstractTableModel
 
     private static final int TYPE = 4;
 
-    private static final String[] COLUMN_NAMES = {"", "", "Column", "New name", "Type"};
+    private static final int ARROWS = 5;
+
+    private static final String[] COLUMN_NAMES = {"", "", "Column", "New name", "Type", ""};
 
     private static final DataColumnSpec NEW_COL_SPEC =
         new DataColumnSpecCreator("<any unknown new column>", DataType.getType(DataCell.class)).createSpec();
@@ -472,6 +475,8 @@ public final class TableTransformationTableModel<T> extends AbstractTableModel
             return transformation.isRenamed() ? transformation.getName() : "";
         } else if (columnIndex == TYPE) {
             return transformation.getProductionPath();
+        } else if (columnIndex == ARROWS) {
+            return null;
         } else {
             throw new IndexOutOfBoundsException();
         }
@@ -492,6 +497,13 @@ public final class TableTransformationTableModel<T> extends AbstractTableModel
             alreadyFiredTableDataChange = updateName(aValue, transformation);
         } else if (columnIndex == TYPE) {
             transformation.setProductionPath((ProductionPath)aValue);
+        } else if (columnIndex == ARROWS) {
+            final Direction direction = (Direction)aValue;
+            if (direction == Direction.UP && rowIndex > 0) {
+                reorder(rowIndex, rowIndex - 1);
+            } else if (direction == Direction.DOWN && rowIndex < getRowCount() - 1) {
+                reorder(rowIndex, rowIndex + 2);
+            }
         } else {
             throw new IndexOutOfBoundsException();
         }
@@ -600,6 +612,7 @@ public final class TableTransformationTableModel<T> extends AbstractTableModel
 
     @Override
     public Class<?> getColumnClass(final int columnIndex) {// NOSONAR, stupid rule
+        // TODO extract into static array
         if (columnIndex == REORDER) {
             return Icon.class;
         } else if (columnIndex == KEEP) {
@@ -610,6 +623,8 @@ public final class TableTransformationTableModel<T> extends AbstractTableModel
             return String.class;
         } else if (columnIndex == TYPE) {
             return ProductionPath.class;
+        } else if (columnIndex == ARROWS) {
+                return Direction.class;
         } else {
             throw new IndexOutOfBoundsException();
         }
@@ -617,10 +632,10 @@ public final class TableTransformationTableModel<T> extends AbstractTableModel
 
     @Override
     public boolean isCellEditable(final int rowIndex, final int columnIndex) {
-        if (getTransformation(rowIndex) == m_newColTransformationPlaceholder && columnIndex != KEEP) {
-            return false;
+        if (getTransformation(rowIndex) == m_newColTransformationPlaceholder) {
+            return columnIndex == KEEP || columnIndex == ARROWS;
         }
-        return columnIndex == KEEP || columnIndex == RENAME || columnIndex == TYPE;
+        return columnIndex == KEEP || columnIndex == RENAME || columnIndex == TYPE || columnIndex == ARROWS;
     }
 
     @Override
